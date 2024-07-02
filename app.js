@@ -4,7 +4,7 @@ const User = require("./models/user.js");
 const userRouter = require("./routes/user.js");
 const app = express();
 app.use(express.json());
-app.use("api/v1/user", userRouter);
+app.use("/api/v1/user", userRouter);
 (async () => {
   try {
     await sequelize.sync();

@@ -1,4 +1,5 @@
 const { DataTypes } = require("sequelize");
+const bcrypt = require("bcrypt");
 const sequelize = require("../utils/database.js");
 const User = sequelize.define("User", {
   id: {
@@ -58,41 +59,6 @@ const User = sequelize.define("User", {
       },
     },
   },
-  familyMobile: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    validate: {
-      isNumeric: {
-        msg: "Family mobile number must contain numeric characters only",
-      },
-      len: {
-        args: [10, 10],
-        msg: "Family mobile number must be 10 digits",
-      },
-    },
-  },
-  pincode: {
-    type: DataTypes.STRING,
-    validate: {
-      isNumeric: {
-        msg: "Pincode must contain numeric characters only",
-      },
-      len: {
-        args: [6, 6],
-        msg: "Pincode must be 6 digits",
-      },
-    },
-  },
-  village: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    validate: {
-      len: {
-        args: [3, 255],
-        msg: "Village name must be between 3 and 255 characters",
-      },
-    },
-  },
   email: {
     type: DataTypes.STRING,
     validate: {
@@ -101,16 +67,15 @@ const User = sequelize.define("User", {
       },
     },
   },
-  country: {
+  password: {
     type: DataTypes.STRING,
     allowNull: false,
-    validate: {
-      len: {
-        args: [3, 255],
-        msg: "Country name must be between 3 and 255 characters",
-      },
-    },
   },
 });
-
+User.addHook("beforeSave", "hashPassword", async function (user, option) {
+  try {
+    const hashedPassword = await bcrypt.hash(user.password, 12);
+    user.password = hashedPassword;
+  } catch (error) {}
+});
 module.exports = User;
